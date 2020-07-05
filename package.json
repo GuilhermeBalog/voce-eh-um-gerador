@@ -1,0 +1,8 @@
+{
+  "name": "voce-eh-um-gerador",
+  "version": "1.0.0",
+  "description": "Gerador de fotos de paginas do tipo \"você é um\"",
+  "main": "index.js",
+  "author": "Guilherme Balog Gardino <guibalog@gmail.com> (https://guilhermebalog.github.io)",
+  "private": false
+}
