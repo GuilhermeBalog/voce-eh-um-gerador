@@ -2,6 +2,8 @@
 
 Gerador de fotos de paginas do tipo *"você é um ..."*
 
+![Demonstração](demo.gif)
+
 ## Como funciona?
 
 A ideia é perguntar para o usuário um tipo de foto, pesquisar na API do Google Images, armazenar uma lista de nomes comuns e cruzar esses dados com ferramenta [ImageMagick](https://imagemagick.org/index.php).
