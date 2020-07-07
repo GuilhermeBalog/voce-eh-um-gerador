@@ -1,4 +1,16 @@
 module.exports = [
+    "João", 
+    "Paulo", 
+    "Gabriel", 
+    "Rodrigo", 
+    "Guilherme",
+    "Ana",
+    "Giovana",
+    "Vitória",
+    "Laura"
+]
+
+/*[
     "José", 
     "João", 
     "Antônio", 
@@ -55,4 +67,4 @@ module.exports = [
     "Bianca",
     "Rafaela",
     "Geovana",
-]
+]*/
