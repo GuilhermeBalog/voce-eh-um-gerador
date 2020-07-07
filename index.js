@@ -73,7 +73,6 @@ async function start(){
 
     async function convertAllImages(state){
         for(let nameIndex = 0; nameIndex < state.names.length; nameIndex++){
-            // console.log()
             await convertImage(nameIndex, state.names[nameIndex].name)
         }
     }
