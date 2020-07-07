@@ -8,38 +8,58 @@ const gm = require('gm').subClass({ imageMagick: true })
 const names = require('./names')
 
 async function start(){
-    const searchTerm = 'rabbit'
+    const state = {}
+    state.searchTerm = 'horse'
+    state.names = names.filter((name, index) => { return index % 5 == 0 }).map(name => { return { name } })
     
-    const urlsFromGoogle = await fetchImagesFromGoogle(searchTerm)
-    await downloadAllImages(urlsFromGoogle)
-    await convertAllImages(urlsFromGoogle.length)
-
+    await fetchImagesFromGoogle(state)
+    await downloadAllImages(state)
+    await convertAllImages(state)
     
-    async function fetchImagesFromGoogle(searchTerm){
-        console.log(`> Procurando imagens para ${searchTerm}`)
+    async function fetchImagesFromGoogle(state){
+        console.log(`> Procurando imagens para ${state.searchTerm}`)
+        let imageCounter = 0
+        for(const name of state.names){
+            const response = await customSearch.cse.list({
+                auth: process.env.GOOGLE_API_KEY,
+                cx: process.env.SEARCH_ENGINE_ID,
+                q: `${state.searchTerm} ${name}`,
+                num: 3,
+                searchType: 'image'
+            })
 
-        const response = await customSearch.cse.list({
-            auth: process.env.GOOGLE_API_KEY,
-            cx: process.env.SEARCH_ENGINE_ID,
-            q: searchTerm,
-            num: 10,
-            searchType: 'image'
-        })
-    
-        const urls = response.data.items.map(item => item.link)
-        console.log(`\t-> ${response.data.items.length} imagen(s) encontrada(s)!`)
+            name.images = response.data.items.map(item => item.link)
+            imageCounter += name.images.length
+            console.log(`\t-> ${name.images.length} imagens para ${state.searchTerm} ${name.name}`)
+        }
 
-        return urls
+        console.log(`\t-> ${imageCounter} imagen(s) encontrada(s)!`)
+
+        // return urls
     }
 
-    async function downloadAllImages(urls){
-        for(let i = 0; i < urls.length; i++){
-            try{
-                await downloadImage(urls[i], `imagem-${i}.png`)
-                console.log(`> Imagem ${i} baixada!`)
-                
-            } catch(error){
-                console.log(`> Erro ao baixar imagem (${i})! ${error}`)
+    async function downloadAllImages(state){
+        state.downloadedImages = []
+
+        for(let nameIndex = 0; nameIndex < state.names.length; nameIndex++){
+            const { images } = state.names[nameIndex]
+
+            for(let imageIndex = 0; imageIndex < images.length; imageIndex++){
+                const imageUrl = images[imageIndex]
+
+                try{
+                    if(state.downloadedImages.includes(imageUrl)){
+                        throw new Error('Essa imagem já foi baixada!')
+                    }
+
+                    await downloadImage(imageUrl, `imagem-${imageIndex}.png`)
+                    state.downloadedImages.push(imageUrl)
+                    console.log(`> Imagem ${i} baixada!`)
+                    break
+
+                } catch(error){
+                    console.log(`> Erro ao baixar imagem ${i}: ${error}`)
+                }
             }
         }
     }
@@ -51,13 +71,14 @@ async function start(){
         })
     }
 
-    async function convertAllImages(numberOfImages){
-        for(let i = 0; i < numberOfImages; i++){
-            await convertImage(i)
+    async function convertAllImages(state){
+        for(let nameIndex = 0; nameIndex < state.names.length; nameIndex++){
+            // console.log()
+            await convertImage(nameIndex, state.names[nameIndex].name)
         }
     }
 
-    async function convertImage(index){
+    async function convertImage(index, name){
         return new Promise((resolve, reject) => {
             const inputFile = `./images/imagem-${index}.png[0]`
             const outputFile = `./images/convertida-${index}.png`
@@ -89,7 +110,7 @@ async function start(){
                 .out('-pointsize', '150')
                 .out('-gravity', 'north')
                 .out('-annotate', '+0+5')
-                .out(` ${names[index]} `)
+                .out(` ${name} `)
                 .write(outputFile, (error) => {
                     if(error){
                         return reject(error)
