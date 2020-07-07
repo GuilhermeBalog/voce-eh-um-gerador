@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
+    "gm": "^1.23.1",
     "googleapis": "^52.1.0",
     "image-downloader": "^4.0.1"
   }
